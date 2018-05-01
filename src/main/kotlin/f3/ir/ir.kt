@@ -30,9 +30,10 @@ data class IrTrait(
 data class IrStruct(
         val module: ModuleName,
         val name: String,
+        val traitsImplemented: List<IrTrait>,
         val fields: List<IrType>,
-        val functions: List<IrFunction>
-) {
+        val methods: List<IrFunction>
+) : IrType {
     fun getStructType(): IrStructType {
         return IrStructType(fields)
     }
@@ -41,9 +42,10 @@ data class IrStruct(
 data class IrStructHeader(
         val module: ModuleName,
         val name: String,
+        val traitsImplemented: List<IrTrait>,
         val fields: List<IrType>,
-        val functions: List<IrFunctionHeader>
-) {
+        val methods: List<IrFunctionHeader>
+) : IrType {
     fun getStructType(): IrStructType {
         return IrStructType(fields)
     }

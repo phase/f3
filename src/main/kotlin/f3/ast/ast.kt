@@ -1,5 +1,7 @@
 package f3.ast
 
+import java.util.*
+
 typealias ModuleName = List<String>
 
 data class AstModule(
@@ -20,6 +22,17 @@ data class AstReference<T>(
         var obj: T? = null
 ) : AstExpression {
     fun isResolved(): Boolean = obj != null
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is AstReference<*>) return false
+        return this.moduleName == other.moduleName
+                && this.reference == other.reference
+                && this.obj == other.obj
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(moduleName, reference, isResolved())
+    }
 }
 
 interface AstType {
