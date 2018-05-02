@@ -8,7 +8,13 @@ fun main(args: Array<String>) {
             listOf("std", "test"),
             listOf<ModuleName>(),
             listOf<AstTrait>(),
-            listOf<AstStruct>(),
+            listOf<AstStruct>(
+                    AstStruct(
+                            "StructA",
+                            listOf<AstVariable>(),
+                            listOf<AstFunction>(),
+                            listOf<AstReference<AstTrait>>())
+            ),
             listOf<AstVariable>(),
             listOf<AstFunction>()
     )
@@ -16,8 +22,7 @@ fun main(args: Array<String>) {
     val resolver = AstResolver(astModule, listOf())
     resolver.resolve()
 
-    val irHeaderBuilder = IrHeaderBuilder(listOf(astModule))
-    val irHeaders = irHeaderBuilder.convert()
+    val irHeaders = IrHeaderBuilder.convert(listOf(astModule))
 
     irHeaders.forEach { println(it) }
 }

@@ -1,11 +1,37 @@
 package f3.ir
 
 import f3.ast.*
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.runBlocking
+import java.util.concurrent.ConcurrentHashMap
 
-class IrHeaderBuilder(val astModules: List<AstModule>) {
+class IrHeaderBuilder private constructor(val astModule: AstModule, val linkedModules: List<AstModule>) {
 
-    val irTypeCache = mutableMapOf<Pair<ModuleName, String>, IrType>()
+    companion object {
+        val irTypeCache = ConcurrentHashMap<Pair<ModuleName, String>, IrType>()
 
+        fun convert(astModules: List<AstModule>): List<IrModuleHeader> {
+            val irModuleHeaders = mutableListOf<IrModuleHeader>()
+
+            val headerThreads = (0 until astModules.size).map {
+                async {
+                    val currentModule = astModules[it]
+                    val linkedModules = astModules.toMutableList()
+                    linkedModules.removeAt(it)
+                    val builder = IrHeaderBuilder(currentModule, linkedModules)
+                    irModuleHeaders.add(builder.convert())
+                }
+            }
+
+            runBlocking {
+                headerThreads.forEach { it.await() }
+            }
+
+            return irModuleHeaders
+        }
+    }
+
+    @Synchronized
     fun <T : AstType> getIrType(currentModule: AstModule, astReference: AstReference<T>): IrType {
         // check primitive
         // (maybe check for module?)
@@ -18,7 +44,7 @@ class IrHeaderBuilder(val astModules: List<AstModule>) {
         irTypeCache[pair]?.let { return it }
 
         val isInModule = currentModule.name == astReference.moduleName
-        val module = if (isInModule) currentModule else astModules.find { it.name == astReference.moduleName }
+        val module = if (isInModule) currentModule else linkedModules.find { it.name == astReference.moduleName }
                 ?: throw IllegalArgumentException("Couldn't find module ${astReference.moduleName}")
 
         val ref = astReference.obj
@@ -36,11 +62,7 @@ class IrHeaderBuilder(val astModules: List<AstModule>) {
         return irType
     }
 
-    fun convert(): List<IrModuleHeader> {
-        return astModules.map { convert(it) }
-    }
-
-    fun convert(astModule: AstModule): IrModuleHeader {
+    fun convert(): IrModuleHeader {
         val name = astModule.name
         val imports = astModule.imports
         val traits = astModule.traits.map { convert(astModule, it) }
