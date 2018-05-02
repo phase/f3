@@ -40,6 +40,10 @@ data class AstReference<T>(
     override fun hashCode(): Int {
         return Objects.hash(moduleName, reference, isResolved())
     }
+
+    override fun toString(): String {
+        return "${moduleName.joinToString("::")}::$reference (resolved=${isResolved()})"
+    }
 }
 
 interface AstType {
