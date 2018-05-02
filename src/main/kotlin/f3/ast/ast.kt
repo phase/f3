@@ -21,11 +21,19 @@ data class AstReference<T>(
         val reference: String
 ) : AstExpression {
 
+    private val lock = Any()
+
     @Volatile
     var obj: T? = null
-        @Synchronized get() = field
-        @Synchronized set(value) {
-            field = value
+        get() {
+            synchronized(lock) {
+                return field
+            }
+        }
+        set(value) {
+            synchronized(lock) {
+                field = value
+            }
         }
 
     fun isResolved(): Boolean = obj != null
