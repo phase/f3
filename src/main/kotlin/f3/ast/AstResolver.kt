@@ -1,6 +1,27 @@
 package f3.ast
 
-class AstResolver(val module: AstModule, val linkedModules: List<AstModule>) {
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.runBlocking
+
+class AstResolver private constructor(val module: AstModule, val linkedModules: List<AstModule>) {
+
+    companion object {
+        fun resolve(astModules: List<AstModule>) {
+            val resolutionThreads = (0 until astModules.size).map {
+                async {
+                    val currentModule = astModules[it]
+                    val linkedModules = astModules.toMutableList()
+                    linkedModules.removeAt(it)
+                    val resolver = AstResolver(currentModule, linkedModules)
+                    resolver.resolve()
+                }
+            }
+
+            runBlocking {
+                resolutionThreads.forEach { it.await() }
+            }
+        }
+    }
 
     val allModules: List<AstModule> by lazy {
         val modules = mutableListOf(module)

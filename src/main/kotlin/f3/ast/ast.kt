@@ -18,9 +18,16 @@ data class AstModule(
  */
 data class AstReference<T>(
         val moduleName: ModuleName,
-        val reference: String,
-        var obj: T? = null
+        val reference: String
 ) : AstExpression {
+
+    @Volatile
+    var obj: T? = null
+        @Synchronized get() = field
+        @Synchronized set(value) {
+            field = value
+        }
+
     fun isResolved(): Boolean = obj != null
 
     override fun equals(other: Any?): Boolean {

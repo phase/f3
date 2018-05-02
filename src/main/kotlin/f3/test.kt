@@ -19,9 +19,7 @@ fun main(args: Array<String>) {
             listOf<AstFunction>()
     )
 
-    val resolver = AstResolver(astModule, listOf())
-    resolver.resolve()
-
+    AstResolver.resolve(listOf(astModule))
     val irHeaders = IrHeaderBuilder.convert(listOf(astModule))
 
     irHeaders.forEach { println(it) }
