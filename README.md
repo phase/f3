@@ -13,7 +13,7 @@ Needs:
         * No ["3 ways to do generics"](https://github.com/rust-lang/rfcs/blob/master/text/1522-conservative-impl-trait.md)
     * Union Types
         * _No_ nulls.
-        * Check Pony's _Primitive Types_.
+        * Check Pony's _Primitive Types_. (0 size structs?)
     * Enums & Type Aliases
         * Aliasing can be great for APIs.
     * Tuples
@@ -27,6 +27,7 @@ Needs:
     * Look at what JavaScript is doing, do not do what JavaScript is doing.
         * lol NPM is garbage
     * Caching package manager with a focus on security.
+        * lol NPM is still garbage
 
 Questions that need to be asked:
 * Are actors possible with no GC?
@@ -36,3 +37,40 @@ Questions that need to be asked:
         * "Debug prints don't need `+IO`" for example.
 * Are explicit allocators viable? (probably yes)
 * How do all the parts tie together?
+
+Compiler:
+* First prototype compiler will probably be written in Kotlin.
+* Then some native language like Rust.
+* Then itself (if I get there).
+* AST -> IR -> Backends
+* Parallel AST resolution
+* Backends:
+    * LLVM
+    * IR Interpreter
+    * WASM (maybe just use LLVM?)
+    * JVM?? (would require a lot of effort to get working with existing Java libraries)
+
+Syntax:
+* C like. Experimental syntaxes never lead anywhere good.
+* No cruft, semicolons need to go
+* thing: Type
+
+```c
+struct X {
+    # No fields can be declared after the function definitions start
+    x: Int32
+    y: In32
+
+    # this would need a mutable reference of 'self'
+    @mut
+    fun doSomething() {
+        self.x = 7
+    }
+}
+
+actor Y {
+    behave runAsync() {
+        # runs code async but everything within an actor is sync
+    }
+}
+```
