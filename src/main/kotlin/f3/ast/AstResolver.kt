@@ -33,6 +33,7 @@ class AstResolver private constructor(val module: AstModule, val linkedModules: 
         module.variables.forEach { resolve(it) }
         module.traits.forEach { resolve(it) }
         module.structs.forEach { resolve(it) }
+        module.functions.forEach { resolve(it) }
     }
 
     inline fun <reified T> resolve(astReference: AstReference<T>) {

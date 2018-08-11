@@ -4,14 +4,15 @@ import f3.ast.*
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
 
 class IrHeaderBuilder private constructor(val astModule: AstModule, val linkedModules: List<AstModule>) {
 
     companion object {
         val irTypeCache = ConcurrentHashMap<Pair<ModuleName, String>, IrType>()
 
-        fun convert(astModules: List<AstModule>): List<IrModuleHeader> {
-            val irModuleHeaders = mutableListOf<IrModuleHeader>()
+        fun convert(astModules: List<AstModule>): Collection<IrModuleHeader> {
+            val irModuleHeaders = ConcurrentLinkedQueue<IrModuleHeader>()
 
             val headerThreads = (0 until astModules.size).map {
                 async {
@@ -24,7 +25,9 @@ class IrHeaderBuilder private constructor(val astModule: AstModule, val linkedMo
             }
 
             runBlocking {
-                headerThreads.forEach { it.await() }
+                headerThreads.forEach {
+                    it.await()
+                }
             }
 
             return irModuleHeaders

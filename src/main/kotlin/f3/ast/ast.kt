@@ -32,7 +32,8 @@ data class AstReference<T>(
         }
         set(value) {
             synchronized(lock) {
-                field = value
+                if (field == null)
+                    field = value
             }
         }
 

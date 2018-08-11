@@ -80,14 +80,14 @@ data class IrFunction(
         val name: String,
         val arguments: List<IrType>,
         val result: IrType,
-        val body: List<IrFunctionBlock>
+        val body: List<IrBlock>
 ) {
     fun getFunctionType(): IrFunctionType {
         return IrFunctionType(arguments, result)
     }
 }
 
-data class IrFunctionBlock(
+data class IrBlock(
         val name: String,
         val instructions: List<IrInstruction>
 )

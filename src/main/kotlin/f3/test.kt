@@ -43,15 +43,32 @@ fun main(args: Array<String>) {
                     )
             ),
             listOf<AstVariable>(),
-            listOf<AstFunction>()
+            listOf<AstFunction>(
+                    AstFunction(
+                            AstFunctionHeader(
+                                    "funA",
+                                    listOf<AstFunctionArgument>(
+                                            AstFunctionArgument(
+                                                    "x",
+                                                    AstReference(listOf("test", "a"), "StructA")
+                                            )
+                                    ),
+                                    AstReference(listOf("test", "a"), "StructA")
+                            ),
+                            listOf<AstStatement>()
+                    )
+            )
     )
 
     val modules = listOf(modA, modB)
+    println("--- Unresolved AST Modules")
     modules.forEach { println(it) }
 
+    println("--- Resolved AST Modules")
     AstResolver.resolve(modules)
     modules.forEach { println(it) }
 
+    println("--- IR Modules")
     val irHeaders = IrHeaderBuilder.convert(modules)
     irHeaders.forEach { println(it) }
 }
